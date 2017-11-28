@@ -120,6 +120,21 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    var holder = [];
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    var returner = [];
+    for (var i = 0; i < array.length; i++) {
+      holder.push(iterator(array[i]));
+      console.log(array[i]);
+    }
+    for (var j = 0; j < holder.length; j++) {
+      if (!returner.includes(holder[j])) {
+        returner.push(holder[j]);
+      }
+    }
+    return returner;
   };
 
 
