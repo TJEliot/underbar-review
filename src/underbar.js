@@ -412,10 +412,10 @@
   _.shuffle = function(array) {
     var returner = [];
     var holder = array.slice();
-    for (var i = 0; i < holder.length; i++) {
+    for (var i = 0; i < array.length; i++) {
       var where = Math.floor(Math.random() * holder.length);
       var thisOne = holder.splice(where, 1);
-      returner.push(thisOne);
+      returner.push(thisOne[0]);
     }
     return returner;
   };
@@ -431,7 +431,7 @@
 
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
-  _.invoke = function(collectio bvn, functionOrKey, args) {
+  _.invoke = function(collection, functionOrKey, args) {
   };
 
   // Sort the object's values by a criterion produced by an iterator.
