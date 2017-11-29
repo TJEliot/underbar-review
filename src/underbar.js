@@ -110,29 +110,46 @@
     //   return !otherTest();
     // };
     //returner = _.filter(collection, fakeFunction(test));    
-    _.each(collection, function(item){
-      if (!test(item)){
+    _.each(collection, function(item) {
+      if (!test(item)) {
         returner.push(item);
       }
     });
     return returner;   
-};
+  };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-    var holder = [];
+    // if array = ['Matt', 'Thomas', 1738]
+    // iterator is "typeof === string"
+    // returner should end up as ['Matt', 1738]
+    // holder is { 'Matt':true, 'Thomas':true, 1738:false }
+    // holder2 is [true, false]
+    // returner is ['Matt', 1738]
+    var holder = {};
     if (iterator === undefined) {
       iterator = _.identity;
     }
     var returner = [];
     for (var i = 0; i < array.length; i++) {
-      holder.push(iterator(array[i]));
-      console.log(array[i]);
+      holder[array[i]] = iterator(array[i]);
     }
-    for (var j = 0; j < holder.length; j++) {
-      if (!returner.includes(holder[j])) {
-        returner.push(holder[j]);
+    var holder2 = []; //list of items in the array we've already encountered
+    for (var key in holder) {
+      //we have an object, holder, which has pairs like {element of array : that element after being iterated}
+      // we want to go through all the key:value pairs in holder, and for each unique value, push the key to returner
+      if (!holder2.includes(holder[key])) {
+        // if holder2 does not include the value in holder associated with the current key, then:
+        // add the key to returner (and turn it into a number)
+        // add the value to holder2
+        // repeat the loop
+        returner.push(+key);
+        holder2.push(holder[key]);
       }
+      
+      // if (!returner.includes(holder[j])) {
+      //   returner.push(holder[j]);
+      // }
     }
     return returner;
   };
@@ -195,6 +212,22 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    if (Array.isArray(collection)) {
+      for (var i = 0; i < collection.length; i++) {
+        if (i === 0 && accumulator === undefined) {
+          accumulator = collection[0];
+        } else {
+          accumulator = iterator(accumulator, collection[i]);
+          // var iterator = function(item){ return item * 3 };
+          // var collection = [1,2,3];
+        }
+      }
+    } else {
+      for (var key in collection) {
+        accumulator = iterator(accumulator, collection[key]);
+      }
+    }
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -213,6 +246,27 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator === undefined) {
+      iterator = _.indentity;
+    }
+    if (collection.length === 0) {
+      return true;
+    }
+    if (Array.isArray(collection)) {
+      for (var i = 0; i < collection.length; i++) {
+        if (!iterator(collection[i])) {
+          return false;
+        }
+      } 
+    }
+    return true;
+    // var allTrueValues = _.map(collection, iterator);
+    // if (allTrueValues.length === collection.length) {
+    //   alert(collection);
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
