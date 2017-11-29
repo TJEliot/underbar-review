@@ -247,7 +247,7 @@
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
     if (iterator === undefined) {
-      iterator = _.indentity;
+      iterator = _.identity;
     }
     if (collection.length === 0) {
       return true;
@@ -273,6 +273,15 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    for (var i = 0; i < collection.length; i++) {
+      if (iterator(collection[i])) {
+        return true;
+      }
+    }
+    return false;
   };
 
 
@@ -295,11 +304,31 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    if (arguments.length > 1) {
+      for (var i = 0; i < arguments.length; i++) {
+        var original = arguments[i];
+        for (var key in original) {
+          obj[key] = original[key];
+        }
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    if (arguments.length > 1) {
+      for (var i = 0; i < arguments.length; i++) {
+        var original = arguments[i];
+        for (var key in original) {
+          if (!(key in obj)) {
+            obj[key] = original[key];
+          }
+        }
+      }
+     return obj;
+    }
   };
 
 
@@ -334,7 +363,7 @@
     };
   };
 
-  // Memorize an expensive function's results by storing them. You may assume
+  // Memoize an expensive function's results by storing them. You may assume
   // that the function only takes primitives as arguments.
   // memoize could be renamed to oncePerUniqueArgumentList; memoize does the
   // same thing as once, but based on many sets of unique arguments.
@@ -343,6 +372,14 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var storage = {};
+    return function() { 
+      var input = JSON.stringify(arguments);
+      if ( !storage.hasOwnProperty(input)) {
+        storage[input] = func.apply(null, arguments);
+      }
+      return storage[input];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -352,6 +389,13 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+//    var args = Array.prototype.slice.call(arguments, 2);
+    // var myArgs = [...arguments].slice(2);
+    var args = Array.from(arguments);
+    args = args.slice(2);
+    return setTimeout(function() {
+      return func.apply(null, args);
+    }, wait);
   };
 
 
@@ -366,6 +410,14 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var returner = [];
+    var holder = array.slice();
+    for (var i = 0; i < holder.length; i++) {
+      var where = Math.floor(Math.random() * holder.length);
+      var thisOne = holder.splice(where, 1);
+      returner.push(thisOne);
+    }
+    return returner;
   };
 
 
@@ -374,12 +426,12 @@
    * =================
    *
    * Note: This is the end of the pre-course curriculum. Feel free to continue,
-   * but nothing beyond here is required.
+  < * but nothing beyond here is required.
    */
 
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
-  _.invoke = function(collection, functionOrKey, args) {
+  _.invoke = function(collectio bvn, functionOrKey, args) {
   };
 
   // Sort the object's values by a criterion produced by an iterator.
